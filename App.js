@@ -40,6 +40,11 @@ function App() {
           component={RegistroScreen} 
           options={{ headerShown: false }} 
         />
+        <Stack.Screen 
+          name="Inicio" 
+          component={InicioScreen}  // Añade la pantalla Inicio
+          options={{ headerShown: false }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
