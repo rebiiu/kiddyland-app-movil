@@ -1,7 +1,35 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ImageBackground, Image } from 'react-native';
+import React, { useState } from 'react';
+import { View, StyleSheet, Alert, ImageBackground, Image } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
 
 const InicioSesionScreen = ({ navigation }) => {
+  const [correo, setCorreo] = useState('');
+  const [clave, setClave] = useState('');
+  const ip = '10.10.2.137'; // Asegúrate de usar la IP correcta
+
+  const handleLogin = async () => {
+    const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logIn`;
+    const formData = new FormData();
+    formData.append('correoCliente', correo);
+    formData.append('claveCliente', clave);
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      if (data.status) {
+        Alert.alert('Bienvenido', 'Inicio de sesión exitoso');
+        navigation.navigate('Inicio');
+      } else {
+        Alert.alert('Error', data.error || 'Error al iniciar sesión');
+      }
+    } catch (error) {
+      Alert.alert('Error', error.message || 'Error de red');
+    }
+  };
+
   return (
     <ImageBackground source={require('../../assets/recu.png')} style={styles.backgroundImage}>
       <View style={styles.container}>
@@ -9,30 +37,29 @@ const InicioSesionScreen = ({ navigation }) => {
         <Image source={require('../../assets/KIDDYLAND.png')} style={styles.image} />
         
         <TextInput
+          label="Correo electrónico"
+          value={correo}
+          onChangeText={setCorreo}
           style={styles.input}
-          placeholder="Correo electrónico:"
-          placeholderTextColor="#ccc"
           keyboardType="email-address"
-          
+          autoCapitalize="none"
         />
         <TextInput
+          label="Contraseña"
+          value={clave}
+          onChangeText={setClave}
           style={styles.input}
-          placeholder="Contraseña:"
-          placeholderTextColor="#ccc"
           secureTextEntry
         />
-        
-        <TouchableOpacity style={styles.forgotButton} onPress={() => navigation.navigate('Recuperacion1')}>
-          <Text style={styles.forgotText}>¿Olvidaste tu contraseña? <Text style={styles.recoverText}>Recuperar</Text></Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Inicio')}>
-          <Text style={styles.buttonText}>Iniciar sesión</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('PantallaInicial')}>
-          <Text style={styles.buttonText}>Regresar</Text>
-        </TouchableOpacity>
+        <Button mode="contained" onPress={handleLogin} style={styles.button}>
+          Iniciar sesión
+        </Button>
+        <Button mode="text" onPress={() => navigation.navigate('Recuperacion1')} style={styles.link}>
+          ¿Olvidaste tu contraseña?
+        </Button>
+        <Button mode="text" onPress={() => navigation.navigate('PantallaInicial')} style={styles.link}>
+          Regresar
+        </Button>
       </View>
     </ImageBackground>
   );
@@ -44,15 +71,12 @@ const styles = StyleSheet.create({
     width: '100%',
     height: '100%',
     justifyContent: 'center',
-   
-    
   },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
-   
   },
   title: {
     fontSize: 24,
@@ -65,8 +89,8 @@ const styles = StyleSheet.create({
     marginBottom: 30,
   },
   input: {
-    width: '90%',
-    padding: 10,
+    width: '80%',
+    padding: 1,
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 15,
@@ -107,5 +131,4 @@ const styles = StyleSheet.create({
     borderRadius: 25
   },
 });
-
 export default InicioSesionScreen;

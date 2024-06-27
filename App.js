@@ -36,6 +36,16 @@ function App() {
           options={{ headerShown: false }} 
         />
         <Stack.Screen 
+          name="Recuperacion2" 
+          component={Recuperacion2Screen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
+          name="Recuperacion3" 
+          component={Recuperacion3Screen} 
+          options={{ headerShown: false }} 
+        />
+        <Stack.Screen 
           name="Registro" 
           component={RegistroScreen} 
           options={{ headerShown: false }} 

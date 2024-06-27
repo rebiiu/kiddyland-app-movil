@@ -1,61 +1,102 @@
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
 
 const RegistroScreen = ({ navigation }) => {
+  const [nombre, setNombre] = useState('');
+  const [apellido, setApellido] = useState('');
+  const [correo, setCorreo] = useState('');
+  const [clave, setClave] = useState('');
+  const [confirmarClave, setConfirmarClave] = useState('');
+  const ip = '10.10.2.137';  // Reemplaza con la IP correcta de tu servidor
+
+  const handleRegister = async () => {
+    if (clave !== confirmarClave) {
+      Alert.alert('Error', 'Las contraseñas no coinciden');
+      return;
+    }
+
+    try {
+      const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=signUpNoCaptcha`;
+      const formData = new FormData();
+      formData.append('nombreCliente', nombre);
+      formData.append('apellidoCliente', apellido);
+      formData.append('correoCliente', correo);
+      formData.append('claveCliente', clave);
+      formData.append('confirmarClave', confirmarClave);
+      formData.append('condicion', '1');  // Marca la aceptación de términos y condiciones (ajusta según tu formulario)
+
+      const response = await fetch(url, {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      if (data.status === 1) {
+        Alert.alert('Éxito', 'Cuenta registrada correctamente');
+        navigation.navigate('InicioSesion');  // Reemplaza con la navegación adecuada
+      } else {
+        Alert.alert('Error', data.error || 'Ocurrió un problema al registrar la cuenta');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'Ocurrió un problema al registrar la cuenta');
+    }
+  };
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <View style={styles.container}>
       <Text style={styles.title}>¡Regístrate!</Text>
       
       <TextInput
         style={styles.input}
         placeholder="Ingrese un nombre:"
         placeholderTextColor="#ccc"
+        value={nombre}
+        onChangeText={setNombre}
       />
       <TextInput
         style={styles.input}
         placeholder="Ingrese un apellido:"
         placeholderTextColor="#ccc"
+        value={apellido}
+        onChangeText={setApellido}
       />
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico:"
         placeholderTextColor="#ccc"
         keyboardType="email-address"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Dirección de domicilio:"
-        placeholderTextColor="#ccc"
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Número telefónico:"
-        placeholderTextColor="#ccc"
-        keyboardType="phone-pad"
+        value={correo}
+        onChangeText={setCorreo}
       />
       <TextInput
         style={styles.input}
         placeholder="Contraseña:"
         placeholderTextColor="#ccc"
         secureTextEntry
+        value={clave}
+        onChangeText={setClave}
       />
       <TextInput
         style={styles.input}
         placeholder="Confirma la contraseña:"
         placeholderTextColor="#ccc"
         secureTextEntry
+        value={confirmarClave}
+        onChangeText={setConfirmarClave}
       />
       
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('InicioSesion')}>
+      <TouchableOpacity style={styles.button} onPress={handleRegister}>
         <Text style={styles.buttonText}>Registrarme</Text>
       </TouchableOpacity>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('PantallaInicial')}>
         <Text style={styles.buttonText}>Regresar</Text>
       </TouchableOpacity>
-    </ScrollView>
+    </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
