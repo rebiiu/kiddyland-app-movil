@@ -45,6 +45,11 @@ function App() {
           component={InicioScreen}  // Añade la pantalla Inicio
           options={{ headerShown: false }} 
         />
+        <Stack.Screen 
+          name="Cuenta" 
+          component={CuentaScreen} 
+          options={{ headerShown: false }} 
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
