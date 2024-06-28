@@ -1,19 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Alert } from 'react-native';
 
-const CuentaScreen = ({ navigation }) => {
 
-    const [nombre, setNombre] = useState(' ');
-    const [apellido, setApellido] = useState(' ');
-    const [correo, setCorreo] = useState(' ');
-    const [direccion, setDireccion] = useState(' ');
-    const [telefono, setTelefono] = useState(' ');
-    const [contrasenaActual, setContrasenaActual] = useState(' ');
+const CuentaScreen = ({ navigation }) => {
+    const [nombre, setNombre] = useState('');
+    const [apellido, setApellido] = useState('');
+    const [correo, setCorreo] = useState('');
+    const [telefono, setTelefono] = useState('');
+    const [contrasenaActual, setContrasenaActual] = useState('');
     const [nuevaContrasena, setNuevaContrasena] = useState('');
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+<<<<<<< HEAD
     const ip = '10.10.3.72';  // Reemplaza con la IP correcta de tu servidor
+=======
+    const ip = '10.10.0.206'; 
+
+    useEffect(() => {
+        // Cargar el perfil del usuario al montar el componente
+        const cargarPerfil = async () => {
+            try {
+                const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=readProfile`);
+                const data = await response.json();
+                if (data.status === 1) {
+                    const perfil = data.dataset;
+                    setNombre(perfil.nombreCliente);
+                    setApellido(perfil.apellidoCliente);
+                    setCorreo(perfil.correoCliente);
+                    setTelefono(perfil.telefonoCliente);
+                } else {
+                    Alert.alert('Error', data.error || 'Ocurrió un problema al cargar el perfil');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
+            }
+        };
+        cargarPerfil();
+    }, []);
+>>>>>>> 6afe2ed13ef52835e34598572d421da1f4fa753b
 
     const showModal = (message) => {
         setModalMessage(message);
@@ -24,25 +50,80 @@ const CuentaScreen = ({ navigation }) => {
         setModalVisible(false);
     };
 
+    const handleActualizarDatos = async () => {
+        try {
+            const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=editProfile`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    nombreCliente: nombre,
+                    apellidoCliente: apellido,
+                    telefonoCliente: telefono,
+                    correoCliente: correo
+                })
+            });
+            const data = await response.json();
+            if (data.status === 1) {
+                showModal('Datos actualizados correctamente');
+            } else {
+                Alert.alert('Error', data.error || 'Ocurrió un problema al actualizar los datos');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Alert.alert('Error', 'Ocurrió un problema al actualizar los datos');
+        }
+    };
+
+    const handleCambiarContrasena = async () => {
+        if (nuevaContrasena !== confirmarContrasena) {
+            showModal('Las contraseñas no coinciden');
+            return;
+        }
+
+        try {
+            const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=changePassword`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    ClaveActual: contrasenaActual,
+                    claveCliente: nuevaContrasena,
+                    confirmarClave: confirmarContrasena
+                })
+            });
+            const data = await response.json();
+            if (data.status === 1) {
+                showModal('Contraseña actualizada correctamente');
+            } else {
+                Alert.alert('Error', data.error || 'Ocurrió un problema al cambiar la contraseña');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Alert.alert('Error', 'Ocurrió un problema al cambiar la contraseña');
+        }
+    };
     const handleLogout = async () => {
         try {
-          const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logOut`;
-          const response = await fetch(url, {
-            method: 'GET'
-          });
-    
-          const data = await response.json();
-          if (data.status === 1) {
-            Alert.alert('Éxito', 'Sesión cerrada correctamente');
-            navigation.navigate('PantallaInicial');  // Reemplaza con la navegación adecuada
-          } else {
-            Alert.alert('Error', data.error || 'Ocurrió un problema al cerrar la sesión');
-          }
+            const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logOut`;
+            const response = await fetch(url, {
+                method: 'GET'
+            });
+
+            const data = await response.json();
+            if (data.status === 1) {
+                Alert.alert('Éxito', 'Sesión cerrada correctamente');
+                navigation.navigate('PantallaInicial');  // Reemplaza con la navegación adecuada
+            } else {
+                Alert.alert('Error', data.error || 'Ocurrió un problema al cerrar la sesión');
+            }
         } catch (error) {
-          console.error('Error:', error);
-          Alert.alert('Error', 'Ocurrió un problema al cerrar la sesión');
+            console.error('Error:', error);
+            Alert.alert('Error', 'Ocurrió un problema al cerrar la sesión');
         }
-      };
+    };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -56,17 +137,14 @@ const CuentaScreen = ({ navigation }) => {
                 <TextInput style={styles.input} value={apellido} onChangeText={setApellido} />
             </View>
             <View style={styles.section}>
-                <Text style={styles.label}>Correo electrónico:</Text>
-                <TextInput style={styles.input} value={correo} onChangeText={setCorreo} keyboardType="email-address" />
-            </View>
-            <View style={styles.section}>
-                <Text style={styles.label}>Direccion de domicilio:</Text>
-                <TextInput style={styles.input} value={direccion} onChangeText={setDireccion} />
-            </View>
-            <View style={styles.section}>
                 <Text style={styles.label}>Número telefónico:</Text>
                 <TextInput style={styles.input} value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
             </View>
+            <View style={styles.section}>
+                <Text style={styles.label}>Correo electrónico:</Text>
+                <TextInput style={styles.input} value={correo} onChangeText={setCorreo} keyboardType="email-address" />
+            </View>
+
             <TouchableOpacity style={styles.button} onPress={() => showModal('Datos actualizados correctamente')}>
                 <Text style={styles.buttonText}>Actualizar</Text>
             </TouchableOpacity>
@@ -127,7 +205,7 @@ const styles = StyleSheet.create({
     },
     section: {
         marginBottom: 20,
-        
+
     },
     label: {
         fontSize: 16,
@@ -173,25 +251,25 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      },
-      modalContent: {
+    },
+    modalContent: {
         width: 300,
         padding: 20,
         backgroundColor: '#fff',
         borderRadius: 10,
         alignItems: 'center',
-      },
-      modalText: {
+    },
+    modalText: {
         fontSize: 18,
         marginBottom: 20,
-      },
-      modalButton: {
+    },
+    modalButton: {
         backgroundColor: '#60BFB2',
         padding: 10,
         borderRadius: 5,
         alignItems: 'center',
-      },
-      modalButtonText: {
+    },
+    modalButtonText: {
         color: '#fff',
         fontSize: 16
     },
