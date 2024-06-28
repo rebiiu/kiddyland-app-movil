@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import * as Constantes from '../utilidades/constantes';
+
 
 const RegistroScreen = ({ navigation }) => {
   const [nombre, setNombre] = useState('');
   const [apellido, setApellido] = useState('');
   const [correo, setCorreo] = useState('');
+  const [telefono, setTelefono] = useState('');
   const [clave, setClave] = useState('');
   const [confirmarClave, setConfirmarClave] = useState('');
-  const ip = Constantes.IP;
+  const ip = '10.10.0.206'; 
 
   const handleRegister = async () => {
     if (clave !== confirmarClave) {
@@ -22,6 +23,7 @@ const RegistroScreen = ({ navigation }) => {
       formData.append('nombreCliente', nombre);
       formData.append('apellidoCliente', apellido);
       formData.append('correoCliente', correo);
+      formData.append('telefonoCliente', telefono);
       formData.append('claveCliente', clave);
       formData.append('confirmarClave', confirmarClave);
 
@@ -69,6 +71,14 @@ const RegistroScreen = ({ navigation }) => {
         value={correo}
         onChangeText={setCorreo}
       />
+       <TextInput
+        style={styles.input}
+        placeholder="Número telefónico:"
+        placeholderTextColor="#ccc"
+        keyboardType="phone-pad"
+        value={telefono}
+        onChangeText={setTelefono}
+      /> 
       <TextInput
         style={styles.input}
         placeholder="Contraseña:"
