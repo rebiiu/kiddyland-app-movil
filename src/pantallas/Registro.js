@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, Alert } from 'react-native';
+import * as Constantes from '../utilidades/constantes';
 
 const RegistroScreen = ({ navigation }) => {
   const [nombre, setNombre] = useState('');
@@ -7,7 +8,7 @@ const RegistroScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
   const [confirmarClave, setConfirmarClave] = useState('');
-  const ip = '10.10.2.137';  // Reemplaza con la IP correcta de tu servidor
+  const ip = Constantes.IP;
 
   const handleRegister = async () => {
     if (clave !== confirmarClave) {

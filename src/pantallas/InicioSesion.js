@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert, ImageBackground, Image } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import * as Constantes from '../utilidades/constantes';
 
 const InicioSesionScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
-  const ip = '10.10.0.206'; // Asegúrate de usar la IP correcta
+  const ip = Constantes.IP;
 
   const handleLogin = async () => {
     const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logIn`;

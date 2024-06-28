@@ -1,5 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
+import * as Constantes from '../utilidades/constantes';
+const ip = Constantes.IP;
 
 const InicioScreen = () => {
   return (

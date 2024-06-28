@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Alert } from 'react-native';
+import * as Constantes from '../utilidades/constantes';
 
 const CuentaScreen = ({ navigation }) => {
 
@@ -13,7 +14,7 @@ const CuentaScreen = ({ navigation }) => {
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const ip = '10.10.2.137';  // Reemplaza con la IP correcta de tu servidor
+    const ip = Constantes.IP;
 
     const showModal = (message) => {
         setModalMessage(message);
