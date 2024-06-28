@@ -5,7 +5,7 @@ import { TextInput, Button, Text } from 'react-native-paper';
 const InicioSesionScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
-  const ip = '10.10.2.137'; // Asegúrate de usar la IP correcta
+  const ip = '10.10.0.206'; // Asegúrate de usar la IP correcta
 
   const handleLogin = async () => {
     const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logIn`;
@@ -21,7 +21,7 @@ const InicioSesionScreen = ({ navigation }) => {
       const data = await response.json();
       if (data.status) {
         Alert.alert('Bienvenido', 'Inicio de sesión exitoso');
-        navigation.navigate('Inicio');
+        navigation.navigate('Cuenta');
       } else {
         Alert.alert('Error', data.error || 'Error al iniciar sesión');
       }

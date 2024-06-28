@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Alert } from 'react-native';
 
 const CuentaScreen = ({ navigation }) => {
 
@@ -13,6 +13,7 @@ const CuentaScreen = ({ navigation }) => {
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const ip = '10.10.0.206';  // Reemplaza con la IP correcta de tu servidor
 
     const showModal = (message) => {
         setModalMessage(message);
@@ -22,6 +23,26 @@ const CuentaScreen = ({ navigation }) => {
     const hideModal = () => {
         setModalVisible(false);
     };
+
+    const handleLogout = async () => {
+        try {
+          const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logOut`;
+          const response = await fetch(url, {
+            method: 'GET'
+          });
+    
+          const data = await response.json();
+          if (data.status === 1) {
+            Alert.alert('Éxito', 'Sesión cerrada correctamente');
+            navigation.navigate('PantallaInicial');  // Reemplaza con la navegación adecuada
+          } else {
+            Alert.alert('Error', data.error || 'Ocurrió un problema al cerrar la sesión');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          Alert.alert('Error', 'Ocurrió un problema al cerrar la sesión');
+        }
+      };
 
     return (
         <ScrollView contentContainerStyle={styles.container}>
@@ -61,7 +82,7 @@ const CuentaScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.button} onPress={() => showModal('Contraseña actualizada correctamente')}>
                 <Text style={styles.buttonText}>Guardar contraseña</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.buttonSecondary} onPress={() => navigation.navigate('InicioSesion')}>
+            <TouchableOpacity style={styles.buttonSecondary} onPress={handleLogout}>
                 <Text style={styles.buttonSecondaryText}>Cerrar sesión</Text>
             </TouchableOpacity>
             <Modal

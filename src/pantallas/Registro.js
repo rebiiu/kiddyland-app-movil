@@ -7,7 +7,7 @@ const RegistroScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
   const [confirmarClave, setConfirmarClave] = useState('');
-  const ip = '10.10.2.137';  // Reemplaza con la IP correcta de tu servidor
+  const ip = '10.10.0.206';  // Reemplaza con la IP correcta de tu servidor
 
   const handleRegister = async () => {
     if (clave !== confirmarClave) {
@@ -16,14 +16,13 @@ const RegistroScreen = ({ navigation }) => {
     }
 
     try {
-      const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=signUpNoCaptcha`;
+      const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=signUpMovil`;
       const formData = new FormData();
       formData.append('nombreCliente', nombre);
       formData.append('apellidoCliente', apellido);
       formData.append('correoCliente', correo);
       formData.append('claveCliente', clave);
       formData.append('confirmarClave', confirmarClave);
-      formData.append('condicion', '1');  // Marca la aceptación de términos y condiciones (ajusta según tu formulario)
 
       const response = await fetch(url, {
         method: 'POST',
