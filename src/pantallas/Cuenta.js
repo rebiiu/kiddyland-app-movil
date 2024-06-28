@@ -13,7 +13,7 @@ const CuentaScreen = ({ navigation }) => {
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const ip = '10.10.0.206';  // Reemplaza con la IP correcta de tu servidor
+    const ip = '10.10.2.137';  // Reemplaza con la IP correcta de tu servidor
 
     const showModal = (message) => {
         setModalMessage(message);
