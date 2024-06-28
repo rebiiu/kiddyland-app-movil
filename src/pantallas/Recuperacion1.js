@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Modal, Alert, ImageBackground, Image } from 'react-native';
+import emailjs from 'emailjs-com';
 
 const Recuperacion1Screen = ({ navigation }) => {
     const [correo, setCorreo] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const ip = '10.10.2.137';  // Reemplaza con la IP correcta de tu servidor
+    const ip = '10.10.3.72';  // Reemplaza con la IP correcta de tu servidor
 
     const showModal = (message) => {
         setModalMessage(message);
@@ -16,84 +17,98 @@ const Recuperacion1Screen = ({ navigation }) => {
         setModalVisible(false);
     };
 
+    const sendVerificationCode = async (correo) => {
+        const verificationCode = Math.floor(10000 + Math.random() * 90000).toString(); // Generar un código de 5 dígitos
+        const serviceID = 'service_pp5r4ak'; // Reemplaza con tu Service ID
+        const templateID = 'template_5eul5pj'; // Reemplaza con tu Template ID
+        const userID = 'X4CwRTiwCOTRli3rP'; // Reemplaza con tu User ID
+
+        const templateParams = {
+            correo_cliente: correo,
+            verification_code: verificationCode,
+        };
+
+        try {
+            const response = await emailjs.send(serviceID, templateID, templateParams, userID);
+            console.log('Correo enviado:', response.status, response.text);
+            showModal('Código de verificación enviado. Por favor, revise su correo.');
+        } catch (error) {
+            console.error('Error al enviar el correo:', error);
+            Alert.alert('Error', 'Ocurrió un problema al enviar el correo electrónico');
+        }
+    };
+
     const handleCheckEmail = async () => {
-      try {
-          const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=checkEmail`;
-          const response = await fetch(url, {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({ correo_cliente: correo }) // Asegúrate de que esta clave coincide con lo esperado en el servidor
-          });
+        try {
+            if (!correo) {
+                Alert.alert('Error', 'Ingrese un correo electrónico válido');
+                return;
+            }
+            const formData = new FormData();
+            formData.append('correoCliente', correo);
+            const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=checkEmail`;
+            const response = await fetch(url, {
+                method: 'POST',
+                body: formData
+            });
 
-          const textResponse = await response.text(); // Obtener respuesta como texto
-          console.log('Respuesta del servidor:', textResponse); // Imprimir la respuesta completa
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
 
-          // Filtrar cualquier mensaje HTML antes de intentar parsear el JSON
-          const jsonStartIndex = textResponse.indexOf('{');
-          const jsonResponse = textResponse.slice(jsonStartIndex);
+            const data = await response.json();
+            console.log('Respuesta del servidor:', data);
 
-          let data;
-          try {
-              data = JSON.parse(jsonResponse); // Intentar parsear la respuesta JSON
-          } catch (error) {
-              console.error('Error al parsear JSON:', error.message);
-              console.error('Respuesta recibida:', jsonResponse); // Imprimir la respuesta en caso de error
-              throw new Error('Error al parsear JSON');
-          }
-
-          console.log('Datos parseados:', data); // Verifica la respuesta parseada
-
-          if (data.status === 1) {
-              navigation.navigate('Recuperacion2'); // Navegar a la nueva pantalla
-          } else {
-              Alert.alert('Error', data.message || 'El correo electrónico no existe');
-          }
-      } catch (error) {
-          console.error('Error:', error);
-          Alert.alert('Error', 'Ocurrió un problema al verificar el correo electrónico');
-      }
-  };
+            if (data.status === 1) {
+                await sendVerificationCode(correo);
+                navigation.navigate('Recuperacion2');
+            } else {
+                Alert.alert('Error', data.message || 'El correo electrónico no existe');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            Alert.alert('Error', 'Ocurrió un problema al verificar el correo electrónico');
+        }
+    };
+    
 
     return (
-      <ImageBackground source={require('../../assets/recu.png')} style={styles.backgroundImage}>
-          <View style={styles.overlay}>
-              <Text style={styles.title}>Recupera tu contraseña</Text>
-              <Image source={require('../../assets/KIDDYLAND.png')} style={styles.image} />
-              <Text style={styles.instruction}>Ingrese su correo electrónico:</Text>
-              <TextInput
-                  style={styles.input}
-                  value={correo}
-                  onChangeText={setCorreo}
-                  keyboardType="email-address"
-                  placeholder="Correo electrónico"
-              />
-              <View style={styles.buttonContainer}>
-                  <TouchableOpacity style={styles.button} onPress={handleCheckEmail}>
-                      <Text style={styles.buttonText}>Verificar Correo</Text>
-                  </TouchableOpacity>
-              </View>
-              <Modal
-                  animationType="slide"
-                  transparent={true}
-                  visible={modalVisible}
-                  onRequestClose={hideModal}
-              >
-                  <View style={styles.modalOverlay}>
-                      <View style={styles.modalContent}>
-                          <Text style={styles.modalText}>{modalMessage}</Text>
-                          <TouchableOpacity style={styles.modalButton} onPress={hideModal}>
-                              <Text style={styles.modalButtonText}>OK</Text>
-                          </TouchableOpacity>
-                      </View>
-                  </View>
-              </Modal>
-          </View>
-      </ImageBackground>
-  );
+        <ImageBackground source={require('../../assets/recu.png')} style={styles.backgroundImage}>
+            <View style={styles.overlay}>
+                <Text style={styles.title}>Recupera tu contraseña</Text>
+                <Image source={require('../../assets/KIDDYLAND.png')} style={styles.image} />
+                <Text style={styles.instruction}>Ingrese su correo electrónico:</Text>
+                <TextInput
+                    style={styles.input}
+                    value={correo}
+                    onChangeText={setCorreo}
+                    keyboardType="email-address"
+                    placeholder="Correo electrónico"
+                />
+                <View style={styles.buttonContainer}>
+                    <TouchableOpacity style={styles.button} onPress={handleCheckEmail}>
+                        <Text style={styles.buttonText}>Verificar Correo</Text>
+                    </TouchableOpacity>
+                </View>
+                <Modal
+                    animationType="slide"
+                    transparent={true}
+                    visible={modalVisible}
+                    onRequestClose={hideModal}
+                >
+                    <View style={styles.modalOverlay}>
+                        <View style={styles.modalContent}>
+                            <Text style={styles.modalText}>{modalMessage}</Text>
+                            <TouchableOpacity style={styles.modalButton} onPress={hideModal}>
+                                <Text style={styles.modalButtonText}>OK</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+            </View>
+        </ImageBackground>
+    );
 };
-
 const styles = StyleSheet.create({
   backgroundImage: {
       flex: 1,

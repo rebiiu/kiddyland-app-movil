@@ -5,7 +5,7 @@ import { TextInput, Button, Text } from 'react-native-paper';
 const InicioSesionScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
-  const ip = '10.10.0.206'; // Asegúrate de usar la IP correcta
+  const ip = '10.10.3.72'; // Asegúrate de usar la IP correcta
 
   const handleLogin = async () => {
     const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logIn`;
