@@ -7,7 +7,7 @@ const Recuperacion1Screen = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
 
-    const ip = '10.10.3.72';  // Reemplaza con la IP correcta de tu servidor
+    const ip = '192.168.1.10';  // Reemplaza con la IP correcta de tu servidor
 
 
     const showModal = (message) => {

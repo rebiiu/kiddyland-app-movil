@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Alert } from 'react-native';
 
-
 const CuentaScreen = ({ navigation }) => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
@@ -12,54 +11,41 @@ const CuentaScreen = ({ navigation }) => {
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const ip = '192.168.1.20';  // Reemplaza con la IP correcta de tu servidor
+    const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario
+    const ip = '192.168.1.10';  // Reemplaza con la IP correcta de tu servidor
 
     useEffect(() => {
-    
-        const handleGetUser = async () => {
-          try {
-            const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=getUser`;
-            const response = await fetch(url, {
-              method: 'GET'
-            });
-            const data = await response.json();
-            if (data.status === 1) {
-              // Actualizar el contexto de usuario o almacenar los datos según sea necesario
-              // Ejemplo de almacenamiento local en el frontend:
-              // AsyncStorage.setItem('userData', JSON.stringify(data));
-              console.log('Usuario:', data.username);
-            } else {
-              Alert.alert('Error', data.error || 'Error al obtener datos del usuario');
-            }
-          } catch (error) {
-            console.error('Error:', error);
-            Alert.alert('Error', 'Ocurrió un problema al obtener datos del usuario');
-          }
-        };
-
         const cargarPerfil = async () => {
             try {
-              const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=readProfile`);
-              const data = await response.json();
-              if (data.status === 1) {
-                const perfil = data.dataset;
-                setNombre(perfil.nombreCliente);
-                setApellido(perfil.apellidoCliente);
-                setCorreo(perfil.correoCliente);
-                setTelefono(perfil.telefonoCliente);
-              } else {
-                Alert.alert('Error', data.error || 'Ocurrió un problema al cargar el perfil');
-              }
+                // Aquí normalmente se manejaría la autenticación y obtención del token
+                const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=readProfile`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Incluir aquí el token de autenticación si ya lo has obtenido
+                        // 'Authorization': `Bearer ${token}`
+                    },
+                });
+                const data = await response.json();
+                if (data.status === 1) {
+                    const perfil = data.profile;
+                    console.log('Perfil cargado:', perfil);
+                    setUserId(perfil.idCliente); // Guarda el ID del cliente
+                    setNombre(perfil.nombreCliente);
+                    setApellido(perfil.apellidoCliente);
+                    setCorreo(perfil.correoCliente);
+                    setTelefono(perfil.telefonoCliente);
+                } else {
+                    Alert.alert('Error', data.message || 'Ocurrió un problema al cargar el perfil');
+                }
             } catch (error) {
-              console.error('Error:', error);
-              Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
+                console.error('Error:', error);
+                Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
             }
-          };
-    
-        cargarPerfil();
-        handleGetUser(); // Llamar a handleGetUser al montar el componente
-      }, []);
+        };
 
+        cargarPerfil();
+    }, []);
 
     const showModal = (message) => {
         setModalMessage(message);
@@ -71,28 +57,32 @@ const CuentaScreen = ({ navigation }) => {
     };
 
     const handleActualizarDatos = async () => {
+        const formData = new FormData();
+        formData.append('idCliente', userId); // Enviar el ID del cliente
+        formData.append('nombreCliente', nombre);
+        formData.append('apellidoCliente', apellido);
+        formData.append('telefonoCliente', telefono);
+        formData.append('correoCliente', correo);
+
         try {
             const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=editProfile`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    // Incluir aquí el token de autenticación si ya lo has obtenido
+                    // 'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    nombreCliente: nombre,
-                    apellidoCliente: apellido,
-                    telefonoCliente: telefono,
-                    correoCliente: correo
-                })
+                body: formData,
             });
             const data = await response.json();
+            console.log('Respuesta actualizar datos:', data);
             if (data.status === 1) {
                 showModal('Datos actualizados correctamente');
             } else {
-                Alert.alert('Error', data.error || 'Ocurrió un problema al actualizar los datos');
+                throw new Error(data.error || 'Ocurrió un problema al actualizar los datos');
             }
         } catch (error) {
-            console.error('Error:', error);
-            Alert.alert('Error', 'Ocurrió un problema al actualizar los datos');
+            console.error('Error al actualizar los datos:', error);
+            Alert.alert('Error', error.message || 'Ocurrió un problema al actualizar los datos');
         }
     };
 
@@ -102,47 +92,52 @@ const CuentaScreen = ({ navigation }) => {
             return;
         }
 
+        const formData = new FormData();
+        formData.append('idCliente', userId); // Enviar el ID del cliente
+        formData.append('ClaveActual', contrasenaActual);
+        formData.append('claveCliente', nuevaContrasena);
+        formData.append('confirmarClave', confirmarContrasena);
+
         try {
             const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=changePassword`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    // Incluir aquí el token de autenticación si ya lo has obtenido
+                    // 'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({
-                    ClaveActual: contrasenaActual,
-                    claveCliente: nuevaContrasena,
-                    confirmarClave: confirmarContrasena
-                })
+                body: formData,
             });
             const data = await response.json();
+            console.log('Respuesta cambiar contraseña:', data);
             if (data.status === 1) {
                 showModal('Contraseña actualizada correctamente');
             } else {
-                Alert.alert('Error', data.error || 'Ocurrió un problema al cambiar la contraseña');
+                throw new Error(data.error || 'Ocurrió un problema al cambiar la contraseña');
             }
         } catch (error) {
-            console.error('Error:', error);
-            Alert.alert('Error', 'Ocurrió un problema al cambiar la contraseña');
+            console.error('Error al cambiar la contraseña:', error);
+            Alert.alert('Error', error.message || 'Ocurrió un problema al cambiar la contraseña');
         }
     };
-    
+
     const handleLogout = async () => {
         try {
             const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logOut`;
             const response = await fetch(url, {
-                method: 'GET'
+                method: 'GET',
             });
 
             const data = await response.json();
+            console.log('Respuesta cerrar sesión:', data);
             if (data.status === 1) {
                 Alert.alert('Éxito', 'Sesión cerrada correctamente');
-                navigation.navigate('PantallaInicial');  // Reemplaza con la navegación adecuada
+                navigation.navigate('PantallaInicial');
             } else {
-                Alert.alert('Error', data.error || 'Ocurrió un problema al cerrar la sesión');
+                throw new Error(data.error || 'Ocurrió un problema al cerrar la sesión');
             }
         } catch (error) {
-            console.error('Error:', error);
-            Alert.alert('Error', 'Ocurrió un problema al cerrar la sesión');
+            console.error('Error al cerrar sesión:', error);
+            Alert.alert('Error', error.message || 'Ocurrió un problema al cerrar la sesión');
         }
     };
 
@@ -200,19 +195,10 @@ const CuentaScreen = ({ navigation }) => {
                 </View>
             </Modal>
         </ScrollView>
-
     );
 };
 
-
-
-
 const styles = StyleSheet.create({
-    title: {
-        fontSize: 24,
-        marginBottom: 20,
-        color: '#333'
-    },
     container: {
         flexGrow: 1,
         padding: 20,
@@ -226,7 +212,6 @@ const styles = StyleSheet.create({
     },
     section: {
         marginBottom: 20,
-
     },
     label: {
         fontSize: 16,
