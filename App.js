@@ -6,13 +6,13 @@ import { createStackNavigator } from '@react-navigation/stack';
 import PantallaInicialScreen from './src/pantallas/PantallaInicial';
 import CarritoScreen from './src/pantallas/Carrito';
 import CuentaScreen from './src/pantallas/Cuenta';
-import DetalleCompraScreen from './src/pantallas/DetalleCompra';
 import InicioScreen from './src/pantallas/Inicio';
 import InicioSesionScreen from './src/pantallas/InicioSesion';
 import Recuperacion1Screen from './src/pantallas/Recuperacion1';
 import Recuperacion2Screen from './src/pantallas/Recuperacion2';
 import Recuperacion3Screen from './src/pantallas/Recuperacion3';
 import RegistroScreen from './src/pantallas/Registro';
+import ProductDetailScreen from './src/pantallas/DetalleCompra';
 
 const Stack = createStackNavigator();
 
@@ -60,6 +60,16 @@ function App() {
           component={CuentaScreen} 
           options={{ headerShown: false }} 
         />
+          <Stack.Screen 
+          name="DetalleCompra" 
+          component={ProductDetailScreen} 
+          options={{ headerShown: false }} 
+          />
+           <Stack.Screen 
+          name="Carrito" 
+          component={CarritoScreen} 
+          options={{ headerShown: false }} 
+          />
       </Stack.Navigator>
     </NavigationContainer>
   );
