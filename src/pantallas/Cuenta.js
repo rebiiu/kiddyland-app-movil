@@ -12,34 +12,54 @@ const CuentaScreen = ({ navigation }) => {
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-<<<<<<< HEAD
-    const ip = '10.10.3.72';  // Reemplaza con la IP correcta de tu servidor
-=======
-    const ip = '10.10.0.206'; 
+    const ip = '192.168.1.20';  // Reemplaza con la IP correcta de tu servidor
 
     useEffect(() => {
-        // Cargar el perfil del usuario al montar el componente
+    
+        const handleGetUser = async () => {
+          try {
+            const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=getUser`;
+            const response = await fetch(url, {
+              method: 'GET'
+            });
+            const data = await response.json();
+            if (data.status === 1) {
+              // Actualizar el contexto de usuario o almacenar los datos según sea necesario
+              // Ejemplo de almacenamiento local en el frontend:
+              // AsyncStorage.setItem('userData', JSON.stringify(data));
+              console.log('Usuario:', data.username);
+            } else {
+              Alert.alert('Error', data.error || 'Error al obtener datos del usuario');
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            Alert.alert('Error', 'Ocurrió un problema al obtener datos del usuario');
+          }
+        };
+
         const cargarPerfil = async () => {
             try {
-                const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=readProfile`);
-                const data = await response.json();
-                if (data.status === 1) {
-                    const perfil = data.dataset;
-                    setNombre(perfil.nombreCliente);
-                    setApellido(perfil.apellidoCliente);
-                    setCorreo(perfil.correoCliente);
-                    setTelefono(perfil.telefonoCliente);
-                } else {
-                    Alert.alert('Error', data.error || 'Ocurrió un problema al cargar el perfil');
-                }
+              const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=readProfile`);
+              const data = await response.json();
+              if (data.status === 1) {
+                const perfil = data.dataset;
+                setNombre(perfil.nombreCliente);
+                setApellido(perfil.apellidoCliente);
+                setCorreo(perfil.correoCliente);
+                setTelefono(perfil.telefonoCliente);
+              } else {
+                Alert.alert('Error', data.error || 'Ocurrió un problema al cargar el perfil');
+              }
             } catch (error) {
-                console.error('Error:', error);
-                Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
+              console.error('Error:', error);
+              Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
             }
-        };
+          };
+    
         cargarPerfil();
-    }, []);
->>>>>>> 6afe2ed13ef52835e34598572d421da1f4fa753b
+        handleGetUser(); // Llamar a handleGetUser al montar el componente
+      }, []);
+
 
     const showModal = (message) => {
         setModalMessage(message);
@@ -105,6 +125,7 @@ const CuentaScreen = ({ navigation }) => {
             Alert.alert('Error', 'Ocurrió un problema al cambiar la contraseña');
         }
     };
+    
     const handleLogout = async () => {
         try {
             const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logOut`;
@@ -145,7 +166,7 @@ const CuentaScreen = ({ navigation }) => {
                 <TextInput style={styles.input} value={correo} onChangeText={setCorreo} keyboardType="email-address" />
             </View>
 
-            <TouchableOpacity style={styles.button} onPress={() => showModal('Datos actualizados correctamente')}>
+            <TouchableOpacity style={styles.button} onPress={handleActualizarDatos}>
                 <Text style={styles.buttonText}>Actualizar</Text>
             </TouchableOpacity>
             <View style={styles.section}>
@@ -157,7 +178,7 @@ const CuentaScreen = ({ navigation }) => {
                 <Text style={styles.label}>Confirma la contraseña:</Text>
                 <TextInput style={styles.input} value={confirmarContrasena} onChangeText={setConfirmarContrasena} secureTextEntry />
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => showModal('Contraseña actualizada correctamente')}>
+            <TouchableOpacity style={styles.button} onPress={handleCambiarContrasena}>
                 <Text style={styles.buttonText}>Guardar contraseña</Text>
             </TouchableOpacity>
             <TouchableOpacity style={styles.buttonSecondary} onPress={handleLogout}>

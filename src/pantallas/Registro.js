@@ -9,11 +9,7 @@ const RegistroScreen = ({ navigation }) => {
   const [telefono, setTelefono] = useState('');
   const [clave, setClave] = useState('');
   const [confirmarClave, setConfirmarClave] = useState('');
-<<<<<<< HEAD
-  const ip = '10.10.3.72';  // Reemplaza con la IP correcta de tu servidor
-=======
-  const ip = '10.10.0.206'; 
->>>>>>> 6afe2ed13ef52835e34598572d421da1f4fa753b
+  const ip = '192.168.1.20';  // Reemplaza con la IP correcta de tu servidor
 
   const handleRegister = async () => {
     if (clave !== confirmarClave) {

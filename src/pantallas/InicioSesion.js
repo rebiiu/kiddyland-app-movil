@@ -1,16 +1,13 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Alert, ImageBackground, Image } from 'react-native';
+import { View, StyleSheet, Alert, ImageBackground, Image, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 
 
 const InicioSesionScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
-<<<<<<< HEAD
-  const ip = '10.10.3.72'; // Asegúrate de usar la IP correcta
-=======
-  const ip = '10.10.0.206'; 
->>>>>>> 6afe2ed13ef52835e34598572d421da1f4fa753b
+  const ip = '192.168.1.20'; // Asegúrate de usar la IP correcta
+
 
   const handleLogin = async () => {
     const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logIn`;
@@ -26,6 +23,8 @@ const InicioSesionScreen = ({ navigation }) => {
       const data = await response.json();
       if (data.status) {
         Alert.alert('Bienvenido', 'Inicio de sesión exitoso');
+        // Llamar a handleGetUser para obtener los datos del usuario
+        handleGetUser();
         navigation.navigate('Cuenta');
       } else {
         Alert.alert('Error', data.error || 'Error al iniciar sesión');
@@ -35,12 +34,55 @@ const InicioSesionScreen = ({ navigation }) => {
     }
   };
 
+  const handleGetUser = async () => {
+    try {
+      const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=getUser`;
+      const response = await fetch(url, {
+        method: 'GET'
+      });
+      const data = await response.json();
+      if (data.status === 1) {
+        // Actualizar el contexto de usuario o almacenar los datos según sea necesario
+        // Ejemplo de almacenamiento local en el frontend:
+        // AsyncStorage.setItem('userData', JSON.stringify(data));
+        console.log('Usuario:', data.username);
+      } else {
+        Alert.alert('Error', data.error || 'Error al obtener datos del usuario');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      Alert.alert('Error', 'Ocurrió un problema al obtener datos del usuario');
+    }
+  };
+  
+  const handleLogout = async () => {
+    try {
+        const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logOut`;
+        const response = await fetch(url, {
+            method: 'GET'
+        });
+
+        const data = await response.json();
+        if (data.status === 1) {
+            Alert.alert('Éxito', 'Sesión cerrada correctamente');
+            navigation.navigate('PantallaInicial');  // Reemplaza con la navegación adecuada
+        } else {
+            Alert.alert('Error', data.error || 'Ocurrió un problema al cerrar la sesión');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        Alert.alert('Error', 'Ocurrió un problema al cerrar la sesión');
+    }
+};
+
+  
+
   return (
     <ImageBackground source={require('../../assets/recu.png')} style={styles.backgroundImage}>
       <View style={styles.container}>
         <Text style={styles.title}>Bienvenido a kiddyland</Text>
         <Image source={require('../../assets/KIDDYLAND.png')} style={styles.image} />
-        
+
         <TextInput
           label="Correo electrónico"
           value={correo}
@@ -65,10 +107,14 @@ const InicioSesionScreen = ({ navigation }) => {
         <Button mode="text" onPress={() => navigation.navigate('PantallaInicial')} style={styles.link}>
           Regresar
         </Button>
+        <TouchableOpacity style={styles.buttonSecondary} onPress={handleLogout}>
+                <Text style={styles.buttonSecondaryText}>Cerrar sesión</Text>
+            </TouchableOpacity>
       </View>
     </ImageBackground>
   );
 };
+
 
 const styles = StyleSheet.create({
   backgroundImage: {
