@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Alert } from 'react-native';
+import BottomMenu from '../components/BottomMenu';
 
 const CuentaScreen = ({ navigation }) => {
     const [nombre, setNombre] = useState('');
@@ -157,7 +158,7 @@ const CuentaScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Mi cuenta</Text>
             <View style={styles.section}>
-                <TextInput style={styles.invisibleInput} value={userId.toString} onChangeText={(text) => {
+                <TextInput style={styles.invisibleInput} value={userId.toString()} onChangeText={(text) => {
                     const idcliente = parseInt(text, 10); setId(idcliente);  // Almacenar como número entero en el estado
                      }}  />
             </View>
@@ -212,6 +213,7 @@ const CuentaScreen = ({ navigation }) => {
                             <Text style={styles.modalButtonText}>OK</Text>
                         </TouchableOpacity>
                     </View>
+                    <bottomMenu/>
                 </View>
             </Modal>
         </ScrollView>

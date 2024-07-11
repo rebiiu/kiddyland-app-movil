@@ -6,7 +6,8 @@ import { TextInput, Button, Text } from 'react-native-paper';
 const InicioSesionScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
-  const ip = '192.168.1.17'; // Asegúrate de usar la IP correcta
+  const [idCliente, setIdCliente] = useState(null);
+  const ip = '192.168.0.13'; // Asegúrate de usar la IP correcta
 
 
   const handleLogin = async () => {
@@ -24,7 +25,7 @@ const InicioSesionScreen = ({ navigation }) => {
       if (data.status) {
         Alert.alert('Bienvenido', 'Inicio de sesión exitoso');
         // Almacena el ID del cliente en AsyncStorage o en el contexto según tu configuración
-        setId(data.idCliente)// Ajusta esto según cómo manejes el estado global o local de la aplicación
+        setIdCliente(data.idCliente);// Ajusta esto según cómo manejes el estado global o local de la aplicación
         navigation.navigate('Cuenta');
       } else {
         Alert.alert('Error', data.error || 'Error al iniciar sesión');

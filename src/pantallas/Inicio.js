@@ -5,7 +5,7 @@ import BottomMenu from '../components/BottomMenu';
 import ProductCard from '../components/card_productos';
 import Categorias from '../components/list_categorias'; // Importa el componente de categorías
 
-const ip = '192.168.1.20';  // Reemplaza con la IP correcta de tu servidor
+const ip = '192.168.0.13';  // Reemplaza con la IP correcta de tu servidor
 
 const InicioScreen = () => {
   const [productos, setProductos] = useState([]);
