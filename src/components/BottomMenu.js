@@ -3,44 +3,21 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons'; // Asegúrate de tener react-native-vector-icons instalado
 import InicioScreen from '../pantallas/Inicio';
 import CuentaScreen from '../pantallas/Cuenta';
-
-const HomeScreen = () => {
-  return (
-    <View style={styles.screenContainer}>
-
-    </View>
-  );
-};
-
-const SearchScreen = () => {
-  return (
-    <View style={styles.screenContainer}>
-      <Text>Search Screen</Text>
-    </View>
-  );
-};
-
-const CartScreen = () => {
-  return (
-    <View style={styles.screenContainer}>
-      <Text>Cart Screen</Text>
-    </View>
-  );
-};
+import CarritoScreen from '../pantallas/Carrito';
 
 const App = () => {
-  const [selectedTab, setSelectedTab] = useState('Home');
+  const [selectedTab, setSelectedTab] = useState('Inicio');
 
   const renderScreen = () => {
     switch (selectedTab) {
-      case 'inicio':
-        return <InicioScreen/>;
+      case 'Inicio':
+        return <InicioScreen />;
       case 'Cuenta':
         return <CuentaScreen />;
       case 'Carrito':
-        return <CartScreen />;
+        return <CarritoScreen />;
       default:
-        return <HomeScreen />;
+        return <InicioScreen />;
     }
   };
 
@@ -48,17 +25,17 @@ const App = () => {
     <View style={styles.container}>
       {renderScreen()}
       <View style={styles.bottomMenu}>
-        <TouchableOpacity style={styles.button} onPress={() => setSelectedTab('Home')}>
-          <Icon name="home-outline" size={30} color={selectedTab === 'Home' ? '#00796b' : 'gray'} />
-          <Text style={{ color: selectedTab === 'Home' ? '#00796b' : 'gray' }}>Home</Text>
+        <TouchableOpacity style={styles.button} onPress={() => setSelectedTab('Inicio')}>
+          <Icon name="home-outline" size={30} color={selectedTab === 'Inicio' ? '#00796b' : 'gray'} />
+          <Text style={{ color: selectedTab === 'Inicio' ? '#00796b' : 'gray' }}>Inicio</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => setSelectedTab('Search')}>
-          <Icon name="search-outline" size={30} color={selectedTab === 'Search' ? '#00796b' : 'gray'} />
-          <Text style={{ color: selectedTab === 'Search' ? '#00796b' : 'gray' }}>Search</Text>
+        <TouchableOpacity style={styles.button} onPress={() => setSelectedTab('Cuenta')}>
+          <Icon name="search-outline" size={30} color={selectedTab === 'Cuenta' ? '#00796b' : 'gray'} />
+          <Text style={{ color: selectedTab === 'Cuenta' ? '#00796b' : 'gray' }}>Cuenta</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button} onPress={() => setSelectedTab('Cart')}>
-          <Icon name="cart-outline" size={30} color={selectedTab === 'Cart' ? '#00796b' : 'gray'} />
-          <Text style={{ color: selectedTab === 'Cart' ? '#00796b' : 'gray' }}>Cart</Text>
+        <TouchableOpacity style={styles.button} onPress={() => setSelectedTab('Carrito')}>
+          <Icon name="cart-outline" size={30} color={selectedTab === 'Carrito' ? '#00796b' : 'gray'} />
+          <Text style={{ color: selectedTab === 'Carrito' ? '#00796b' : 'gray' }}>Carrito</Text>
         </TouchableOpacity>
       </View>
     </View>
