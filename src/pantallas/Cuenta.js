@@ -11,42 +11,50 @@ const CuentaScreen = ({ navigation }) => {
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario
-    const ip = '192.168.1.10';  // Reemplaza con la IP correcta de tu servidor
-
+    const [userId, setId] = useState(''); // Estado para almacenar el ID del usuario
+ // Estado para almacenar el ID del usuario
+    const ip = '192.168.0.13';  // Reemplaza con la IP correcta de tu servidor
     useEffect(() => {
-        const cargarPerfil = async () => {
-            try {
-                // Aquí normalmente se manejaría la autenticación y obtención del token
-                const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=readProfile`, {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        // Incluir aquí el token de autenticación si ya lo has obtenido
-                        // 'Authorization': `Bearer ${token}`
-                    },
-                });
-                const data = await response.json();
-                if (data.status === 1) {
-                    const perfil = data.profile;
-                    console.log('Perfil cargado:', perfil);
-                    setUserId(perfil.idCliente); // Guarda el ID del cliente
-                    setNombre(perfil.nombreCliente);
-                    setApellido(perfil.apellidoCliente);
-                    setCorreo(perfil.correoCliente);
-                    setTelefono(perfil.telefonoCliente);
-                } else {
-                    Alert.alert('Error', data.message || 'Ocurrió un problema al cargar el perfil');
-                }
-            } catch (error) {
-                console.error('Error:', error);
-                Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
-            }
-        };
+      const cargarPerfil = async () => {
+          try {
+              const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/mi_cuenta.php?action=readProfile`, {
+                  method: 'GET',
+                  headers: {
+                      'Content-Type': 'application/json',
+                      // Incluir aquí el token de autenticación si ya lo has obtenido
+                      // 'Authorization': `Bearer ${token}`
+                  },
+              });
+              const data = await response.json();
+              if (data.status === 1) {
+                  const perfil = data.dataset;
+                  console.log('Perfil cargado:', perfil);
+                  setId(perfil.id_cliente); // Guarda el ID del cliente
+                  setNombre(perfil.nombre_cliente);
+                  setApellido(perfil.apellido_cliente);
+                  setCorreo(perfil.correo_cliente);
+                  setTelefono(perfil.telefono_cliente);
+                  console.log('Teléfono:', perfil.id_cliente);
+              } else {
+                  Alert.alert('Error', data.message || 'Ocurrió un problema al cargar el perfil');
+              }
+          } catch (error) {
+              console.error('Error al cargar el perfil:', error);
+              Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
+          }
+      };
 
-        cargarPerfil();
-    }, []);
+      cargarPerfil();
+  }, []);
 
+  // Renderizar un indicador de carga o mensaje mientras se carga el perfil
+  if (userId === null) {
+      return (
+          <View style={styles.loadingContainer}>
+              <Text>Cargando perfil...</Text>
+          </View>
+      );
+  }
     const showModal = (message) => {
         setModalMessage(message);
         setModalVisible(true);
@@ -57,15 +65,14 @@ const CuentaScreen = ({ navigation }) => {
     };
 
     const handleActualizarDatos = async () => {
-        const formData = new FormData();
-        formData.append('idCliente', userId); // Enviar el ID del cliente
+        const formData = new FormData(); // Enviar el ID del cliente
         formData.append('nombreCliente', nombre);
         formData.append('apellidoCliente', apellido);
         formData.append('telefonoCliente', telefono);
         formData.append('correoCliente', correo);
 
         try {
-            const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=editProfile`, {
+            const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/mi_cuenta.php?action=editProfile`, {
                 method: 'POST',
                 headers: {
                     // Incluir aquí el token de autenticación si ya lo has obtenido
@@ -111,6 +118,11 @@ const CuentaScreen = ({ navigation }) => {
             console.log('Respuesta cambiar contraseña:', data);
             if (data.status === 1) {
                 showModal('Contraseña actualizada correctamente');
+                // Reiniciar los inputs de contraseñas
+            setContrasenaActual('');
+            setNuevaContrasena('');
+            setConfirmarContrasena('');
+
             } else {
                 throw new Error(data.error || 'Ocurrió un problema al cambiar la contraseña');
             }
@@ -145,6 +157,11 @@ const CuentaScreen = ({ navigation }) => {
         <ScrollView contentContainerStyle={styles.container}>
             <Text style={styles.title}>Mi cuenta</Text>
             <View style={styles.section}>
+                <TextInput style={styles.invisibleInput} value={userId.toString} onChangeText={(text) => {
+                    const idcliente = parseInt(text, 10); setId(idcliente);  // Almacenar como número entero en el estado
+                     }}  />
+            </View>
+            <View style={styles.section}>
                 <Text style={styles.label}>Nombre:</Text>
                 <TextInput style={styles.input} value={nombre} onChangeText={setNombre} />
             </View>
@@ -154,7 +171,10 @@ const CuentaScreen = ({ navigation }) => {
             </View>
             <View style={styles.section}>
                 <Text style={styles.label}>Número telefónico:</Text>
-                <TextInput style={styles.input} value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
+                <TextInput style={styles.input} value={telefono.toString()} onChangeText={(text) => {
+                    const numeroTelefono = parseInt(text, 10); setTelefono(numeroTelefono);  // Almacenar como número entero en el estado
+                     }} 
+                     keyboardType="phone-pad"/>           
             </View>
             <View style={styles.section}>
                 <Text style={styles.label}>Correo electrónico:</Text>
@@ -204,6 +224,12 @@ const styles = StyleSheet.create({
         padding: 20,
         backgroundColor: '#fff',
     },
+    invisibleInput: {
+        height: 0, 
+        opacity: 0, 
+        position: 'absolute', 
+        top: -1000,
+      },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
