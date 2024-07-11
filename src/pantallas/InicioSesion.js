@@ -8,6 +8,7 @@ const InicioSesionScreen = ({ navigation }) => {
   const [clave, setClave] = useState('');
   const ip = '192.168.1.17'; // Asegúrate de usar la IP correcta
 
+
   const handleLogin = async () => {
     const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logIn`;
     const formData = new FormData();

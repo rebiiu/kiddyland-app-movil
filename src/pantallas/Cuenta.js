@@ -1,13 +1,7 @@
-// screens/Carrito.js
-import React, { useEffect, useState } from 'react';
-import { Text, TouchableOpacity, View, StyleSheet, Alert } from 'react-native';
-import Constants from 'expo-constants';
-import * as Constantes from '../utilidades/constantes';
-import UserList from '../components/Usuario/ListaUsuarios';
-import UserModal from '../components/Modal/ModalUsuario';
-import Buttons from '../components/BottomMenu';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ScrollView, Modal, Alert } from 'react-native';
 
-const Admin = ({ logueado, setLogueado }) => {
+const CuentaScreen = ({ navigation }) => {
     const [nombre, setNombre] = useState('');
     const [apellido, setApellido] = useState('');
     const [correo, setCorreo] = useState('');
@@ -17,197 +11,274 @@ const Admin = ({ logueado, setLogueado }) => {
     const [confirmarContrasena, setConfirmarContrasena] = useState('');
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
-    const [userId, setId] = useState(null); // Estado para almacenar el ID del usuario
-    const ip = '192.168.1.17';
+    const [userId, setUserId] = useState(null); // Estado para almacenar el ID del usuario
+    const ip = '192.168.1.10';  // Reemplaza con la IP correcta de tu servidor
 
-  useEffect(() => {
-    fetchUsuarios();
-  }, []);
+    useEffect(() => {
+        const cargarPerfil = async () => {
+            try {
+                // Aquí normalmente se manejaría la autenticación y obtención del token
+                const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=readProfile`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        // Incluir aquí el token de autenticación si ya lo has obtenido
+                        // 'Authorization': `Bearer ${token}`
+                    },
+                });
+                const data = await response.json();
+                if (data.status === 1) {
+                    const perfil = data.profile;
+                    console.log('Perfil cargado:', perfil);
+                    setUserId(perfil.idCliente); // Guarda el ID del cliente
+                    setNombre(perfil.nombreCliente);
+                    setApellido(perfil.apellidoCliente);
+                    setCorreo(perfil.correoCliente);
+                    setTelefono(perfil.telefonoCliente);
+                } else {
+                    Alert.alert('Error', data.message || 'Ocurrió un problema al cargar el perfil');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Alert.alert('Error', 'Ocurrió un problema al cargar el perfil');
+            }
+        };
 
-  const fetchUsuarios = async () => {
-    try {
-      const response = await fetch(`${Constantes.IP}/Kiddyland3/api/servicios/publico/cliente.php?action=readAll`, {
-        method: 'GET',
-      });
+        cargarPerfil();
+    }, []);
 
-      const data = await response.json();
-      if (data.status) {
-        setDataUsuarios(data.dataset);
-      } else {
-        Alert.alert('Error', data.error);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al listar los usuarios');
-    }
-  };
+    const showModal = (message) => {
+        setModalMessage(message);
+        setModalVisible(true);
+    };
 
-  const handleCreateUser = async () => {
-    if (clave !== confirmarClave) {
-      Alert.alert('Error', 'Las contraseñas no coinciden');
-      return;
-    }
+    const hideModal = () => {
+        setModalVisible(false);
+    };
 
-    const formData = new FormData();
-    formData.append('nombreAdministrador', nombre);
-    formData.append('apellidoAdministrador', apellido);
-    formData.append('correoAdministrador', correo);
-    formData.append('aliasAdministrador', alias);
-    formData.append('claveAdministrador', clave);
-    formData.append('confirmarClave', confirmarClave);
+    const handleActualizarDatos = async () => {
+        const formData = new FormData();
+        formData.append('idCliente', userId); // Enviar el ID del cliente
+        formData.append('nombreCliente', nombre);
+        formData.append('apellidoCliente', apellido);
+        formData.append('telefonoCliente', telefono);
+        formData.append('correoCliente', correo);
 
-    try {
-      const response = await fetch(`${Constantes.IP}/coffeeshop/api/services/admin/administrador.php?action=createRow`, {
-        method: 'POST',
-        body: formData,
-      });
+        try {
+            const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=editProfile`, {
+                method: 'POST',
+                headers: {
+                    // Incluir aquí el token de autenticación si ya lo has obtenido
+                    // 'Authorization': `Bearer ${token}`
+                },
+                body: formData,
+            });
+            const data = await response.json();
+            console.log('Respuesta actualizar datos:', data);
+            if (data.status === 1) {
+                showModal('Datos actualizados correctamente');
+            } else {
+                throw new Error(data.error || 'Ocurrió un problema al actualizar los datos');
+            }
+        } catch (error) {
+            console.error('Error al actualizar los datos:', error);
+            Alert.alert('Error', error.message || 'Ocurrió un problema al actualizar los datos');
+        }
+    };
 
-      const data = await response.json();
+    const handleCambiarContrasena = async () => {
+        if (nuevaContrasena !== confirmarContrasena) {
+            showModal('Las contraseñas no coinciden');
+            return;
+        }
 
-      if (data.status) {
-        Alert.alert('Éxito', data.message);
-        fetchUsuarios();
-        setIsModalVisible(false);
-      } else {
-        Alert.alert('Error', data.error);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al crear el usuario');
-    }
-  };
+        const formData = new FormData();
+        formData.append('idCliente', userId); // Enviar el ID del cliente
+        formData.append('ClaveActual', contrasenaActual);
+        formData.append('claveCliente', nuevaContrasena);
+        formData.append('confirmarClave', confirmarContrasena);
 
-  const handleEditUser = async () => {
-    try {
-      const formData = new FormData();
-      formData.append('idAdministrador', idAdmin);
-      formData.append('nombreAdministrador', nombre);
-      formData.append('apellidoAdministrador', apellido);
-      formData.append('correoAdministrador', correo);
+        try {
+            const response = await fetch(`http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=changePassword`, {
+                method: 'POST',
+                headers: {
+                    // Incluir aquí el token de autenticación si ya lo has obtenido
+                    // 'Authorization': `Bearer ${token}`
+                },
+                body: formData,
+            });
+            const data = await response.json();
+            console.log('Respuesta cambiar contraseña:', data);
+            if (data.status === 1) {
+                showModal('Contraseña actualizada correctamente');
+            } else {
+                throw new Error(data.error || 'Ocurrió un problema al cambiar la contraseña');
+            }
+        } catch (error) {
+            console.error('Error al cambiar la contraseña:', error);
+            Alert.alert('Error', error.message || 'Ocurrió un problema al cambiar la contraseña');
+        }
+    };
 
-      const response = await fetch(`${Constantes.IP}/coffeeshop/api/services/admin/administrador.php?action=updateRow`, {
-        method: 'POST',
-        body: formData,
-      });
+    const handleLogout = async () => {
+        try {
+            const url = `http://${ip}/Kiddyland3/api/servicios/publico/cliente.php?action=logOut`;
+            const response = await fetch(url, {
+                method: 'GET',
+            });
 
-      const data = await response.json();
-      if (data.status) {
-        Alert.alert('Éxito', data.message);
-        fetchUsuarios();
-        setIsModalVisible(false);
-      } else {
-        Alert.alert('Error', data.error);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al editar el usuario');
-    }
-  };
+            const data = await response.json();
+            console.log('Respuesta cerrar sesión:', data);
+            if (data.status === 1) {
+                Alert.alert('Éxito', 'Sesión cerrada correctamente');
+                navigation.navigate('PantallaInicial');
+            } else {
+                throw new Error(data.error || 'Ocurrió un problema al cerrar la sesión');
+            }
+        } catch (error) {
+            console.error('Error al cerrar sesión:', error);
+            Alert.alert('Error', error.message || 'Ocurrió un problema al cerrar la sesión');
+        }
+    };
 
-  const handleDeleteUser = async (userId) => {
-    try {
-      const formData = new FormData();
-      formData.append('idAdministrador', userId);
-      const response = await fetch(`${Constantes.IP}/coffeeshop/api/services/admin/administrador.php?action=deleteRow`, {
-        method: 'POST',
-        body: formData,
-      });
+    return (
+        <ScrollView contentContainerStyle={styles.container}>
+            <Text style={styles.title}>Mi cuenta</Text>
+            <View style={styles.section}>
+                <Text style={styles.label}>Nombre:</Text>
+                <TextInput style={styles.input} value={nombre} onChangeText={setNombre} />
+            </View>
+            <View style={styles.section}>
+                <Text style={styles.label}>Apellido:</Text>
+                <TextInput style={styles.input} value={apellido} onChangeText={setApellido} />
+            </View>
+            <View style={styles.section}>
+                <Text style={styles.label}>Número telefónico:</Text>
+                <TextInput style={styles.input} value={telefono} onChangeText={setTelefono} keyboardType="phone-pad" />
+            </View>
+            <View style={styles.section}>
+                <Text style={styles.label}>Correo electrónico:</Text>
+                <TextInput style={styles.input} value={correo} onChangeText={setCorreo} keyboardType="email-address" />
+            </View>
 
-      const data = await response.json();
-      if (data.status) {
-        Alert.alert('Éxito', data.message);
-        fetchUsuarios();
-      } else {
-        Alert.alert('Error', data.error);
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Ocurrió un error al eliminar el usuario');
-    }
-  };
-
-  const openCreateModal = () => {
-    setId('');
-    setNombre('');
-    setApellido('');
-    setCorreo('');
-    setAlias('');
-    setClave('');
-    setConfirmar('');
-    setModalType('create');
-    setIsModalVisible(true);
-  };
-
-  const openEditModal = (user) => {
-    setNombre(user.nombre_administrador);
-    setApellido(user.apellido_administrador);
-    setCorreo(user.correo_administrador);
-    setAlias('');
-    setClave('');
-    setConfirmar('');
-    setId(user.id_administrador);
-    setSelectedUser(user);
-    setModalType('edit');
-    setIsModalVisible(true);
-  };
-
-  const closeModal = () => {
-    setIsModalVisible(false);
-  };
-
-  const handleSubmit = () => {
-    if (modalType === 'create') {
-      handleCreateUser();
-    } else {
-      handleEditUser();
-    }
-  };
-
-  return (
-    <View style={styles.container}>
-      <UserList users={dataUsuarios} onEdit={openEditModal} onDelete={handleDeleteUser} />
-      <TouchableOpacity style={styles.addButton} onPress={openCreateModal}>
-        <Text style={styles.addButtonText}>Agregar Usuario</Text>
-      </TouchableOpacity>
-      <UserModal
-        isVisible={isModalVisible}
-        onClose={closeModal}
-        onSubmit={handleSubmit}
-        nombre={nombre}
-        setNombre={setNombre}
-        apellido={apellido}
-        setApellido={setApellido}
-        correo={correo}
-        setCorreo={setCorreo}
-        alias={alias}
-        setAlias={setAlias}
-        clave={clave}
-        setClave={setClave}
-        confirmarClave={confirmarClave}
-        setConfirmarClave={setConfirmar}
-        modalType={modalType}
-      />
-    </View>
-  );
+            <TouchableOpacity style={styles.button} onPress={handleActualizarDatos}>
+                <Text style={styles.buttonText}>Actualizar</Text>
+            </TouchableOpacity>
+            <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Cambiar contraseña:</Text>
+                <Text style={styles.label}>Actual contraseña:</Text>
+                <TextInput style={styles.input} value={contrasenaActual} onChangeText={setContrasenaActual} secureTextEntry />
+                <Text style={styles.label}>Nueva contraseña:</Text>
+                <TextInput style={styles.input} value={nuevaContrasena} onChangeText={setNuevaContrasena} secureTextEntry />
+                <Text style={styles.label}>Confirma la contraseña:</Text>
+                <TextInput style={styles.input} value={confirmarContrasena} onChangeText={setConfirmarContrasena} secureTextEntry />
+            </View>
+            <TouchableOpacity style={styles.button} onPress={handleCambiarContrasena}>
+                <Text style={styles.buttonText}>Guardar contraseña</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.buttonSecondary} onPress={handleLogout}>
+                <Text style={styles.buttonSecondaryText}>Cerrar sesión</Text>
+            </TouchableOpacity>
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={hideModal}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.modalContent}>
+                        <Text style={styles.modalText}>{modalMessage}</Text>
+                        <TouchableOpacity style={styles.modalButton} onPress={hideModal}>
+                            <Text style={styles.modalButtonText}>OK</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+        </ScrollView>
+    );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    backgroundColor: '#ecf0f1',
-    paddingTop: Constants.statusBarHeight,
-    paddingHorizontal: 20,
-  },
-  addButton: {
-    backgroundColor: '#AF8260',
-    borderRadius: 5,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  addButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '600',
-  },
+    container: {
+        flexGrow: 1,
+        padding: 20,
+        backgroundColor: '#fff',
+    },
+    title: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 20,
+        textAlign: 'center',
+    },
+    section: {
+        marginBottom: 20,
+    },
+    label: {
+        fontSize: 16,
+        color: '#333',
+        marginBottom: 5,
+    },
+    input: {
+        height: 50,
+        borderColor: '#ccc',
+        borderWidth: 1,
+        borderRadius: 15,
+        paddingHorizontal: 10,
+        backgroundColor: '#fff'
+    },
+    button: {
+        backgroundColor: '#60BFB2',
+        padding: 15,
+        borderRadius: 15,
+        alignItems: 'center',
+        marginBottom: 20,
+    },
+    buttonText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    buttonSecondary: {
+        backgroundColor: '#FFAB9F',
+        padding: 15,
+        borderRadius: 15,
+        alignItems: 'center',
+    },
+    buttonSecondaryText: {
+        color: '#fff',
+        fontSize: 16,
+    },
+    sectionTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 10,
+    },
+    modalOverlay: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContent: {
+        width: 300,
+        padding: 20,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        alignItems: 'center',
+    },
+    modalText: {
+        fontSize: 18,
+        marginBottom: 20,
+    },
+    modalButton: {
+        backgroundColor: '#60BFB2',
+        padding: 10,
+        borderRadius: 5,
+        alignItems: 'center',
+    },
+    modalButtonText: {
+        color: '#fff',
+        fontSize: 16
+    },
 });
 
-export default Admin;
+export default CuentaScreen;
