@@ -6,7 +6,7 @@ import { TextInput, Button, Text } from 'react-native-paper';
 const InicioSesionScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
-  const ip = '192.168.1.10'; // Asegúrate de usar la IP correcta
+  const ip = '192.168.1.17'; // Asegúrate de usar la IP correcta
 
 
   const handleLogin = async () => {
@@ -25,7 +25,7 @@ const InicioSesionScreen = ({ navigation }) => {
         Alert.alert('Bienvenido', 'Inicio de sesión exitoso');
         // Llamar a handleGetUser para obtener los datos del usuario
         handleGetUser();
-        navigation.navigate('Cuenta');
+        navigation.navigate('Inicio');
       } else {
         Alert.alert('Error', data.error || 'Error al iniciar sesión');
       }

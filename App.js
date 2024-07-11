@@ -13,6 +13,8 @@ import Recuperacion2Screen from './src/pantallas/Recuperacion2';
 import Recuperacion3Screen from './src/pantallas/Recuperacion3';
 import RegistroScreen from './src/pantallas/Registro';
 import ProductDetailScreen from './src/pantallas/DetalleCompra';
+import ProductCard from './src/components/card_productos';
+import Categorias from './src/components/list_categorias';
 
 const Stack = createStackNavigator();
 
@@ -71,6 +73,19 @@ function App() {
           options={{ headerShown: false }} 
           />
       </Stack.Navigator>
+      <Stack.Screen 
+          name="Producto" 
+          component={ProductCard} 
+          options={{ headerShown: false }} 
+          />
+
+<Stack.Screen
+        name="Categoria"
+        component={Categorias}
+        options={{ headerShown: false }}
+      />
+
+
     </NavigationContainer>
   );
 }
