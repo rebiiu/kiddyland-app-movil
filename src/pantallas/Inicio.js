@@ -3,7 +3,7 @@ import { View, TextInput, FlatList, Image, StyleSheet, ActivityIndicator, Text }
 import * as Constantes from '../utilidades/constantes';
 import BottomMenu from '../components/BottomMenu';
 import ProductCard from '../components/card_productos';
-import Categorias from '../components/list_categorias';
+import Categorias from '../components/list_categorias'; // Importa el componente de categorías
 
 const ip = Constantes.IP; // Asegúrate de tener la IP correcta desde tus constantes
 
@@ -13,7 +13,7 @@ const InicioScreen = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const url = `http://${ip}/Kiddyland3/api/servicios/publico/producto.php?action=readProductosCategoria`;
+      const url = `http://${ip}/Kiddyland3/api/servicios/publico/categoria_seleccionada.php?action=readProductosCategoria`;
       
       try {
         const response = await fetch(url);
@@ -41,7 +41,7 @@ const InicioScreen = () => {
         <Image source={require('../../assets/KIDDYLAND.png')} style={styles.teddyIcon} />
         <TextInput style={styles.searchInput} placeholder="Buscar" />
       </View>
-      <Categorias />
+      <Categorias/> 
       <View style={styles.containerItems}>
         {loading ? (
           <ActivityIndicator size="large" color="#0000ff" />
@@ -59,6 +59,7 @@ const InicioScreen = () => {
           <Text>No hay productos disponibles.</Text>
         )}
       </View>
+      
       <BottomMenu />
     </View>
   );

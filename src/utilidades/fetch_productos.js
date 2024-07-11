@@ -9,7 +9,7 @@ const ProductListScreen = () => {
 
   useEffect(() => {
     const fetchData = async () => {
-      const url = `http://${ip}/Kiddyland3/api/servicios/publico/producto.php?action=readProductosCategoria`;
+      const url = `http://${ip}/Kiddyland3/api/servicios/publico/categoria_seleccionada.php?action=readProductosCategoria`;
       
       try {
         const response = await fetch(url);
