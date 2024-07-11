@@ -6,7 +6,7 @@ import { TextInput, Button, Text } from 'react-native-paper';
 const InicioSesionScreen = ({ navigation }) => {
   const [correo, setCorreo] = useState('');
   const [clave, setClave] = useState('');
-  const ip = '192.168.1.10'; // Asegúrate de usar la IP correcta
+  const ip = '192.168.0.11'; // Asegúrate de usar la IP correcta
 
 
   const handleLogin = async () => {
