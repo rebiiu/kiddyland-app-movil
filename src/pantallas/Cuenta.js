@@ -18,7 +18,7 @@ const Admin = ({ logueado, setLogueado }) => {
     const [modalVisible, setModalVisible] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
     const [userId, setId] = useState(null); // Estado para almacenar el ID del usuario
-    const ip = '192.168.0.11';
+    const ip = '192.168.1.17';
 
   useEffect(() => {
     fetchUsuarios();
